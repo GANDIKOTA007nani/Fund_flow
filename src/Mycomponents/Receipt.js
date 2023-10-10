@@ -15,7 +15,6 @@ function Table() {
     'year',
     'period',
     'reference',
-    'paymentProject',
     'receiptProject',
     'amount',
     'status',
@@ -32,7 +31,7 @@ function Table() {
         },
       };
       const response = await axios.get(
-        'https://api.p360.build:6060/v1/fundflow/p2p-payments/fetchAll',
+        'https://api.p360.build:6060/v1/fundflow/r2cSurplusFundsTransfer/fetchAll',
         Cookie
       ); // Replace with your actual API endpoint
       const data = response.data.data; // Assuming your API response is an array of objects
@@ -50,7 +49,6 @@ function Table() {
   }, []);
 
   const transactionType = ['RAN', 'BLR', 'HYD', 'CO'];
-  
   const statusOptions = [
     { label: 'Draft', color: 'red' },
     { label: 'Submit', color: 'green' },
@@ -60,15 +58,13 @@ function Table() {
   const [editableRows, setEditableRows] = useState([]);
   const [tableData, setTableData] = useState([]);
   const [referenceErrors, setReferenceErrors] = useState([]);
-  const [paymentProjectErrors, setPaymentProjectErrors] = useState([]);
   const [receiptProjectErrors, setReceiptProjectErrors] = useState([]);
   const [amountErrors, setAmountErrors] = useState([]);
   const [statusValues, setStatusValues] = useState([]);
   const referenceInputRefs = useRef([]);
-  const paymentProjectInputRefs = useRef([]);
   const receiptProjectInputRefs = useRef([]);
   
-  
+
   const inputHeight = '16px';
 
 
@@ -192,23 +188,7 @@ function Table() {
     }
   };
 
-  const handlePaymentProjectInputChange = (index, value) => {
-    const updatedTableData = [...tableData];
-    updatedTableData[index]['paymentProject'] = value;
-
-    const paymentProjectErrorsCopy = [...paymentProjectErrors];
-    paymentProjectErrorsCopy[index] =
-      value.length > 9 ? '("paymentProject" must be 9 characters or less)' : '';
-
-    setTableData(updatedTableData);
-    setPaymentProjectErrors(paymentProjectErrorsCopy);
-    adjustPaymentProjectInput(index);
-  };
-
-  const adjustPaymentProjectInput = (index) => {
-    // Add adjustment logic here if needed
-  };
-
+  
   const handleReceiptProjectInputChange = (index, value) => {
     const updatedTableData = [...tableData];
     updatedTableData[index]['receiptProject'] = value;
@@ -225,6 +205,7 @@ function Table() {
   const adjustReceiptProjectInput = (index) => {
     // Add adjustment logic here if needed
   };
+
 
 
   const handleStatusChange = (index, value) => {
@@ -257,8 +238,9 @@ function Table() {
 
     if (
       referenceErrors[index] ||
-      paymentProjectErrors[index] ||
+     
       receiptProjectErrors[index] ||
+      
       amountErrors[index]
     ) {
       return false;
@@ -287,14 +269,14 @@ function Table() {
       if (rowToSave.id) {
         // Perform a PUT request to update an existing row
         await axios.put(
-          `https://api.p360.build:6060/v1/fundflow/p2p-payments/submit`,
+          `https://api.p360.build:6060/v1/fundflow/r2cSurplusFundsTransfer/submit`,
           rowToSave, // Send the rowToSave object directly as the request body
           Cookie
         );
       } else {
         // Handle the case of adding a new row (you may want to adjust the URL)
         await axios.post(
-          'https://api.p360.build:6060/v1/fundflow/p2p-payments/draft',
+          'https://api.p360.build:6060/v1/fundflow/receiptsFromRO/draft',
           rowToSave, // Send the rowToSave object directly as the request body
           Cookie
         );
@@ -345,7 +327,7 @@ function Table() {
         }}
       >
         <div>
-          <h2>P2P Payments</h2>
+          <h2>Receipt From RO</h2>
         </div>
         <div>
           <div style={{ position: 'relative' }}>
@@ -462,19 +444,7 @@ function Table() {
                           ref={(inputRef) => (referenceInputRefs.current[rowIndex] = inputRef)}
                           disabled={!editableRows.includes(rowIndex)}
                         />
-                      ) : header === 'paymentProject' ? (
-                        <input
-                          type="text"
-                          value={rowData[header]}
-                          onChange={(e) => {
-                            handlePaymentProjectInputChange(rowIndex, e.target.value);
-                          }}
-                          onInput={() => adjustPaymentProjectInput(rowIndex)}
-                          maxLength={9}
-                          style={{ width: '80px', height: inputHeight }}
-                          ref={(inputRef) => (paymentProjectInputRefs.current[rowIndex] = inputRef)}
-                          disabled={!editableRows.includes(rowIndex)}
-                        />
+                      
                       ) : header === 'receiptProject' ? (
                         <input
                           type="text"
@@ -488,6 +458,7 @@ function Table() {
                           ref={(inputRef) => (receiptProjectInputRefs.current[rowIndex] = inputRef)}
                           disabled={!editableRows.includes(rowIndex)}
                         />
+                      
                       ) : header === 'amount' ? (
                         <>
                           <input

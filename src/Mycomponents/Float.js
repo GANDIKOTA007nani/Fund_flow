@@ -12,7 +12,18 @@ import icon9 from '../Icons/icon9.png';
 import icon10 from '../Icons/icon10.png';
 import icon11 from '../Icons/icon11.png';
 import P2p from './P2p'
-import Co from './Co'; // Import your "Co" component (adjust the import path as needed)
+import Co from './Co';
+import P2ploans from './P2ploans';
+import ROtoRO from './ROtoRO';
+import P2R from './P2R';
+import Receipt from './Receipt';
+import Assets from './Assets';
+import Payments from './Payments';
+import R2C from './R2C';
+import Term from './Term';
+import Reserves from './Reserves';
+
+
 
 
 const buttonStyle = {
@@ -112,7 +123,25 @@ function Float() {
       case 'CO Levies':
         return <Co />;
       case 'P2P Payments':
-        return <P2p/>; 
+        return <P2p/>;
+      case 'P2P Loans':
+        return <P2ploans/>;
+      case 'RO To RO Loans':
+        return <ROtoRO/>;
+      case 'P2R Surplus':
+        return <P2R/>; 
+      case 'Receipt From RO':
+        return <Receipt/>; 
+      case 'Assets Funds':
+        return <Assets/>;
+      case 'Term Loan Setoff':
+        return <Term/>;
+      case 'Reserves':
+        return <Reserves/>; 
+      case 'Payments':
+        return <Payments/>;
+      case 'R2C Surplus':
+        return <R2C/>;
       default:
         return null; // Render nothing by default
     }

@@ -15,8 +15,8 @@ function Table() {
     'year',
     'period',
     'reference',
-    'paymentProject',
-    'receiptProject',
+    'Project',
+    'ledger',
     'amount',
     'status',
   ];
@@ -32,7 +32,7 @@ function Table() {
         },
       };
       const response = await axios.get(
-        'https://api.p360.build:6060/v1/fundflow/p2p-payments/fetchAll',
+        'https://api.p360.build:6060/v1/fundflow/reserves/fetchAll',
         Cookie
       ); // Replace with your actual API endpoint
       const data = response.data.data; // Assuming your API response is an array of objects
@@ -50,7 +50,7 @@ function Table() {
   }, []);
 
   const transactionType = ['RAN', 'BLR', 'HYD', 'CO'];
-  
+  const ledgerOptions = ['Advance Tax 1%', 'Admin Charges 4%', 'Ad charges 1% B2B'];
   const statusOptions = [
     { label: 'Draft', color: 'red' },
     { label: 'Submit', color: 'green' },
@@ -60,13 +60,13 @@ function Table() {
   const [editableRows, setEditableRows] = useState([]);
   const [tableData, setTableData] = useState([]);
   const [referenceErrors, setReferenceErrors] = useState([]);
-  const [paymentProjectErrors, setPaymentProjectErrors] = useState([]);
-  const [receiptProjectErrors, setReceiptProjectErrors] = useState([]);
+  const [ProjectErrors, setProjectErrors] = useState([]);
+  const [ledgerErrors, setLedgerErrors] = useState([]);
   const [amountErrors, setAmountErrors] = useState([]);
   const [statusValues, setStatusValues] = useState([]);
   const referenceInputRefs = useRef([]);
-  const paymentProjectInputRefs = useRef([]);
-  const receiptProjectInputRefs = useRef([]);
+  const ProjectInputRefs = useRef([]);
+ 
   
   
   const inputHeight = '16px';
@@ -192,40 +192,35 @@ function Table() {
     }
   };
 
-  const handlePaymentProjectInputChange = (index, value) => {
+  const handleProjectInputChange = (index, value) => {
     const updatedTableData = [...tableData];
-    updatedTableData[index]['paymentProject'] = value;
+    updatedTableData[index]['Project'] = value;
 
-    const paymentProjectErrorsCopy = [...paymentProjectErrors];
-    paymentProjectErrorsCopy[index] =
-      value.length > 9 ? '("paymentProject" must be 9 characters or less)' : '';
+    const ProjectErrorsCopy = [...ProjectErrors];
+    ProjectErrorsCopy[index] =
+      value.length > 9 ? '("Project" must be 9 characters or less)' : '';
 
     setTableData(updatedTableData);
-    setPaymentProjectErrors(paymentProjectErrorsCopy);
-    adjustPaymentProjectInput(index);
+    setProjectErrors(ProjectErrorsCopy);
+    adjustProjectInput(index);
   };
 
-  const adjustPaymentProjectInput = (index) => {
+  const adjustProjectInput = (index) => {
     // Add adjustment logic here if needed
   };
 
-  const handleReceiptProjectInputChange = (index, value) => {
-    const updatedTableData = [...tableData];
-    updatedTableData[index]['receiptProject'] = value;
 
-    const receiptProjectErrorsCopy = [...receiptProjectErrors];
-    receiptProjectErrorsCopy[index] =
-      value.length > 9 ? '("receiptProject" must be 9 characters or less)' : '';
+
+  const handleLedgerInputChange = (index, value) => {
+    const updatedTableData = [...tableData];
+    updatedTableData[index]['ledger'] = value;
+
+    const ledgerErrorsCopy = [...ledgerErrors];
+    ledgerErrorsCopy[index] = '';
 
     setTableData(updatedTableData);
-    setReceiptProjectErrors(receiptProjectErrorsCopy);
-    adjustReceiptProjectInput(index);
+    setLedgerErrors(ledgerErrorsCopy);
   };
-
-  const adjustReceiptProjectInput = (index) => {
-    // Add adjustment logic here if needed
-  };
-
 
   const handleStatusChange = (index, value) => {
     const updatedStatusValues = [...statusValues];
@@ -257,8 +252,8 @@ function Table() {
 
     if (
       referenceErrors[index] ||
-      paymentProjectErrors[index] ||
-      receiptProjectErrors[index] ||
+      ProjectErrors[index] ||
+      ledgerErrors[index] ||
       amountErrors[index]
     ) {
       return false;
@@ -287,14 +282,14 @@ function Table() {
       if (rowToSave.id) {
         // Perform a PUT request to update an existing row
         await axios.put(
-          `https://api.p360.build:6060/v1/fundflow/p2p-payments/submit`,
+          `https://api.p360.build:6060/v1/fundflow/reserves/submit`,
           rowToSave, // Send the rowToSave object directly as the request body
           Cookie
         );
       } else {
         // Handle the case of adding a new row (you may want to adjust the URL)
         await axios.post(
-          'https://api.p360.build:6060/v1/fundflow/p2p-payments/draft',
+          'https://api.p360.build:6060/v1/fundflow/reserves/draft',
           rowToSave, // Send the rowToSave object directly as the request body
           Cookie
         );
@@ -345,7 +340,7 @@ function Table() {
         }}
       >
         <div>
-          <h2>P2P Payments</h2>
+          <h2>Reserves</h2>
         </div>
         <div>
           <div style={{ position: 'relative' }}>
@@ -462,32 +457,32 @@ function Table() {
                           ref={(inputRef) => (referenceInputRefs.current[rowIndex] = inputRef)}
                           disabled={!editableRows.includes(rowIndex)}
                         />
-                      ) : header === 'paymentProject' ? (
+                      ) : header === 'Project' ? (
                         <input
                           type="text"
                           value={rowData[header]}
                           onChange={(e) => {
-                            handlePaymentProjectInputChange(rowIndex, e.target.value);
+                            handleProjectInputChange(rowIndex, e.target.value);
                           }}
-                          onInput={() => adjustPaymentProjectInput(rowIndex)}
+                          onInput={() => adjustProjectInput(rowIndex)}
                           maxLength={9}
                           style={{ width: '80px', height: inputHeight }}
-                          ref={(inputRef) => (paymentProjectInputRefs.current[rowIndex] = inputRef)}
+                          ref={(inputRef) => (ProjectInputRefs.current[rowIndex] = inputRef)}
                           disabled={!editableRows.includes(rowIndex)}
                         />
-                      ) : header === 'receiptProject' ? (
-                        <input
-                          type="text"
+                     
+                      ) : header === 'ledger' ? (
+                        <select
                           value={rowData[header]}
-                          onChange={(e) => {
-                            handleReceiptProjectInputChange(rowIndex, e.target.value);
-                          }}
-                          onInput={() => adjustReceiptProjectInput(rowIndex)}
-                          maxLength={9}
-                          style={{ width: '80px', height: inputHeight }}
-                          ref={(inputRef) => (receiptProjectInputRefs.current[rowIndex] = inputRef)}
+                          onChange={(e) => handleLedgerInputChange(rowIndex, e.target.value)}
                           disabled={!editableRows.includes(rowIndex)}
-                        />
+                        >
+                          {ledgerOptions.map((option) => (
+                            <option key={option} value={option}>
+                              {option}
+                            </option>
+                          ))}
+                        </select>
                       ) : header === 'amount' ? (
                         <>
                           <input
